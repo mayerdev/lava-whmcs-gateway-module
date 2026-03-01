@@ -46,28 +46,28 @@ function lava_config()
             'Type' => 'text',
             'Size' => '50',
             'Default' => '',
-            'Description' => 'UUID идентификатор проекта из личного кабинета Lava.ru',
+            'Description' => 'Project UUID from your Lava.ru dashboard',
         ),
         'secretKey' => array(
             'FriendlyName' => 'Secret Key',
             'Type' => 'password',
             'Size' => '100',
             'Default' => '',
-            'Description' => 'Секретный ключ для подписи запросов',
+            'Description' => 'Secret key for signing API requests',
         ),
         'webhookKey' => array(
             'FriendlyName' => 'Webhook Key (Additional Key)',
             'Type' => 'password',
             'Size' => '100',
             'Default' => '',
-            'Description' => 'Дополнительный ключ для проверки подписи в webhook',
+            'Description' => 'Additional key for webhook signature verification',
         ),
         'expireMinutes' => array(
             'FriendlyName' => 'Expire (minutes)',
             'Type' => 'text',
             'Size' => '10',
             'Default' => '60',
-            'Description' => 'Время жизни счёта в минутах (макс. 7200 = 5 дней)',
+            'Description' => 'Invoice lifetime in minutes (max 7200 = 5 days)',
         ),
     );
 }
@@ -166,7 +166,7 @@ function lava_link($params)
     // Gateway Configuration Parameters
     $shopId = $params['shopId'];
     $secretKey = $params['secretKey'];
-    $expireMinutes = (int)$params['expireMinutes'] ?: 60;
+    $expireMinutes = (int) $params['expireMinutes'] ?: 60;
 
     // Invoice Parameters
     $invoiceId = $params['invoiceid'];
@@ -189,7 +189,7 @@ function lava_link($params)
 
     // Prepare request data (matching SDK CreateInvoiceDto)
     $requestData = [
-        'sum' => (float)$amount,
+        'sum' => (float) $amount,
         'orderId' => $uniqueOrderId,
         'shopId' => $shopId,
         'hookUrl' => $systemUrl . 'modules/gateways/callback/' . $moduleName . '.php',

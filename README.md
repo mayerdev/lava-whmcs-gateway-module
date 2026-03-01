@@ -1,50 +1,50 @@
 # WHMCS Lava.ru Payment Gateway
 
-Модуль платежного шлюза для интеграции платежной системы **Lava.ru** (Business API) с биллинг-панелью **WHMCS**.
+A payment gateway module for integrating the **Lava.ru** (Business API) payment system with the **WHMCS** billing panel.
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![AI: Claude](https://img.shields.io/badge/AI-Claude-blueviolet)
 
-## 🤖 О проекте
+## 🤖 About the Project
 
-Этот модуль позволяет принимать платежи от клиентов через сервис Lava.ru.
-**Важно:** Код данного проекта был полностью написан с использованием нейросети **Claude** (Anthropic).
+This module allows you to accept payments from clients via the Lava.ru service.
+**Note:** The code for this project was entirely written using the **Claude** (Anthropic) AI.
 
-## ✨ Возможности
+## ✨ Features
 
-*   Создание счетов через API Lava.ru (Business).
-*   Автоматическая генерация подписи (HMAC SHA256).
-*   Настройка времени жизни счета.
-*   Логирование запросов и ответов в "Module Log" WHMCS для отладки.
-*   Поддержка перенаправления клиента после успешной оплаты.
+*   Invoice creation via the Lava.ru Business API.
+*   Automatic signature generation (HMAC SHA256).
+*   Configurable invoice expiration time.
+*   Request and response logging in the WHMCS "Module Log" for debugging.
+*   Client redirect support after successful payment.
 
-## 🚀 Установка
+## 🚀 Installation
 
-1.  Скачайте файл модуля (например, `lava.php`).
-2.  Загрузите файл в директорию вашего WHMCS:
+1.  Download the module file (e.g., `lava.php`).
+2.  Upload the file to your WHMCS directory:
     `/modules/gateways/lava.php`
-3.  *(Опционально)* Убедитесь, что у вас есть файл обработки callback-ов по пути `/modules/gateways/callback/lava.php` (он необходим для автоматического зачисления платежей).
+3.  *(Optional)* Make sure you have the callback handler file at `/modules/gateways/callback/lava.php` (it is required for automatic payment processing).
 
-## ⚙️ Настройка
+## ⚙️ Configuration
 
-1.  Зайдите в админ-панель WHMCS.
-2.  Перейдите в **Настройки** -> **Приложения и интеграции**.
-3.  Найдите и активируйте **Lava**.
-4.  Заполните поля конфигурации:
-    *   **Shop ID**: UUID вашего проекта из личного кабинета Lava.ru.
-    *   **Secret Key**: Секретный ключ для подписи запросов (из настроек проекта в Lava).
-    *   **Webhook Key**: Дополнительный ключ для проверки уведомлений (если используется).
-    *   **Expire (minutes)**: Время жизни ссылки на оплату (по умолчанию 60 минут).
-5.  Сохраните изменения.
+1.  Log in to the WHMCS admin panel.
+2.  Go to **Settings** -> **Apps & Integrations**.
+3.  Find and activate **Lava**.
+4.  Fill in the configuration fields:
+    *   **Shop ID**: Your project's UUID from the Lava.ru dashboard.
+    *   **Secret Key**: The secret key for signing requests (from the project settings in Lava).
+    *   **Webhook Key**: An additional key for verifying webhook notifications (if used).
+    *   **Expire (minutes)**: Payment link lifetime (default: 60 minutes).
+5.  Save changes.
 
-## 📝 Лицензия
+## 📝 License
 
-Этот проект распространяется под лицензией **MIT**.
+This project is distributed under the **MIT** License.
 
 ```text
 MIT License
 
-Copyright (c) 2026 TenHopesForOneSolution
+Copyright (c) 2026 apexnodes-developers
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -65,6 +65,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## ⚠️ Отказ от ответственности
+## ⚠️ Disclaimer
 
-Данный код предоставлен "как есть". Пожалуйста, протестируйте модуль в среде разработки (Dev mode) перед использованием на реальном проекте. Автор и разработчик ИИ не несут ответственности за возможные финансовые потери или ошибки в работе модуля.
+This code is provided "as is". Please test the module in a development environment (Dev mode) before using it in production. The author and the AI developer are not responsible for any financial losses or errors in the module's operation.
