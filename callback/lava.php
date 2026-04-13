@@ -74,43 +74,48 @@ if (empty($orderId) || empty($status)) {
 
 // Verify signature
 $webhookKey = $gatewayParams['webhookKey'];
-if (!empty($webhookKey)) {
-    // Get signature from Authorization header
-    $headers = getallheaders();
-    $receivedSignature = null;
 
-    // Check different possible header names (case-insensitive)
-    foreach ($headers as $key => $value) {
-        if (strtolower($key) === 'authorization') {
-            $receivedSignature = $value;
-            break;
-        }
-        if (strtolower($key) === 'signature') {
-            $receivedSignature = $value;
-            break;
-        }
+if (empty($webhookKey)) {
+    logTransaction($gatewayParams['name'], 'Webhook key is not configured', 'Failure');
+    http_response_code(500);
+    die('Webhook key not configured');
+}
+
+// Get signature from Authorization or Signature header
+$headers = getallheaders();
+$receivedSignature = null;
+
+foreach ($headers as $key => $value) {
+    if (strtolower($key) === 'authorization' || strtolower($key) === 'signature') {
+        $receivedSignature = $value;
+        break;
     }
+}
 
-    if (!empty($receivedSignature)) {
-        // Generate signature for verification (based on SDK)
-        // Sort data by keys and create JSON
-        $verifyData = $data;
-        ksort($verifyData);
-        $jsonData = json_encode($verifyData);
+if (empty($receivedSignature)) {
+    logTransaction($gatewayParams['name'], [
+        'error' => 'Missing signature header',
+        'headers' => $headers,
+    ], 'Failure');
+    http_response_code(403);
+    die('Missing signature');
+}
 
-        $calculatedSignature = hash_hmac('sha256', $jsonData, $webhookKey);
+// Generate signature for verification (based on SDK)
+$verifyData = $data;
+ksort($verifyData);
+$calculatedSignature = hash_hmac('sha256', json_encode($verifyData), $webhookKey);
 
-        if (!hash_equals($calculatedSignature, $receivedSignature)) {
-            logTransaction($gatewayParams['name'], [
-                'error' => 'Signature verification failed',
-                'received' => $receivedSignature,
-                'calculated' => $calculatedSignature,
-                'data' => $data,
-            ], 'Failure');
-            http_response_code(403);
-            die('Invalid signature');
-        }
-    }
+if (!hash_equals($calculatedSignature, $receivedSignature)) {
+    logTransaction($gatewayParams['name'], [
+        'error' => 'Signature verification failed',
+        'received' => $receivedSignature,
+        'calculated' => $calculatedSignature,
+        'data' => $data,
+    ], 'Failure');
+
+    http_response_code(403);
+    die('Invalid signature');
 }
 
 // Extract invoice ID from order_id (format: invoiceId_timestamp)

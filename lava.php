@@ -104,6 +104,45 @@ function lava_clearData($data)
 }
 
 /**
+ * Convert amount to RUB using exchange rate API.
+ *
+ * @param float $amount Amount to convert
+ * @param string $currency Source currency code (e.g. 'USD')
+ * @return float|false Converted amount in RUB, or false on failure
+ */
+function lava_convertToRub($amount, $currency)
+{
+    if ($currency === 'RUB') {
+        return $amount;
+    }
+
+    $url = 'https://rates.as199566.net/' . urlencode($currency) . '/RUB';
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: application/json']);
+    $response = curl_exec($ch);
+    $error = curl_error($ch);
+    curl_close($ch);
+
+    if ($error || empty($response)) {
+        logModuleCall('Lava', 'convertToRub', ['currency' => $currency], 'cURL Error: ' . $error, null);
+        return false;
+    }
+
+    $data = json_decode($response, true);
+
+    if (empty($data['rate']) || !is_numeric($data['rate'])) {
+        logModuleCall('Lava', 'convertToRub', ['currency' => $currency], 'Invalid rate response: ' . $response, null);
+        return false;
+    }
+
+    return round($amount * (float) $data['rate'], 2);
+}
+
+/**
  * Make API request to Lava.ru
  * Signature is passed in request body, not in header.
  *
@@ -173,6 +212,9 @@ function lava_link($params)
     $description = $params['description'];
     $amount = $params['amount'];
 
+    // todo: нормальное определение валюты
+    $currency = 'USD';
+
     // System Parameters
     $systemUrl = $params['systemurl'];
     $returnUrl = $params['returnurl'];
@@ -182,6 +224,16 @@ function lava_link($params)
     // Validate configuration
     if (empty($shopId) || empty($secretKey)) {
         return '<div class="alert alert-danger">Lava.ru: Module not configured properly</div>';
+    }
+
+    // Convert amount to RUB if needed (Lava only accepts RUB)
+    if ($currency !== 'RUB') {
+        $amountRub = lava_convertToRub($amount, $currency);
+        if ($amountRub === false) {
+            return '<div class="alert alert-danger">Lava.ru: Failed to fetch exchange rate for ' . htmlspecialchars($currency) . '/RUB</div>';
+        }
+
+        $amount = $amountRub;
     }
 
     // Generate unique orderId (Lava requires unique orderId for each request)
